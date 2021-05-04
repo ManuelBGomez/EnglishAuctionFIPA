@@ -5,6 +5,9 @@
  */
 package P6_ComDis.Auctioneer;
 
+import jade.core.AID;
+import java.util.ArrayList;
+
 /**
  * Clase que representa una subasta de las que se realizarán.
  * @author Manuel Bendaña
@@ -14,6 +17,8 @@ public class Auction {
     private String productName;
     private Float price;
     private Float sum;
+    private ArrayList<AID> roundParticipants;
+    private ArrayList<AID> prevRoundParticipants;
 
     /**
      * Constructor de la clase
@@ -23,6 +28,7 @@ public class Auction {
      * @param sum La suma de precio que se hace de cada vez
      */
     public Auction(Integer id, String productName, Float price, Float sum) {
+        this.id = id;
         this.productName = productName;
         this.price = price;
         this.sum = sum;
@@ -91,7 +97,36 @@ public class Auction {
     public void setId(Integer id) {
         this.id = id;
     }
-    
-    
-    
+
+    /**
+     * Método que permite recuperar los participantes de la ronda actual
+     * @return El arraylist de participantes de la ronda actual
+     */
+    public ArrayList<AID> getRoundParticipants() {
+        return roundParticipants;
+    }
+
+    /**
+     * Método que permite establecer el array de participantes de la ronda actual.
+     * @param roundParticipants El arraylist a asociar
+     */
+    public void setRoundParticipants(ArrayList<AID> roundParticipants) {
+        this.roundParticipants = roundParticipants;
+    }
+
+    /**
+     * Método que permite recuperar el array de participantes de la ronda previa.
+     * @return El arraylist de participantes de la ronda anterior.
+     */
+    public ArrayList<AID> getPrevRoundParticipants() {
+        return prevRoundParticipants;
+    }
+
+    /**
+     * Método que permite establecer el array de participantes de la ronda previa
+     * @param prevRoundParticipants El arraylist a asociar
+     */
+    public void setPrevRoundParticipants(ArrayList<AID> prevRoundParticipants) {
+        this.prevRoundParticipants = prevRoundParticipants;
+    }
 }
