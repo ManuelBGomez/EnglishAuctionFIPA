@@ -7,6 +7,9 @@ import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +24,7 @@ public class BookAuctioneerAgent extends Agent {
     private ArrayList<AID> clients;
     private int numAuctions;
     private AuctioneerGUI auctioneerGUI;
+    private MessageTemplate mt;
     
     
     /**
@@ -47,7 +51,7 @@ public class BookAuctioneerAgent extends Agent {
                 DFAgentDescription template = new DFAgentDescription();
                 ServiceDescription sd = new ServiceDescription();
                 
-                sd.setType("subasta");
+                sd.setType("auction");
                 
                 // Asociamos a la DFAgentDescription el servicio de subastas.
                 // LOs vendedores interesados se añadirán:
@@ -61,8 +65,8 @@ public class BookAuctioneerAgent extends Agent {
                     clients = new ArrayList<>();
                     
                     // Para cada agente encontrado se recupera su AID:
-                    for(int i = 0; i < result.length; i++){
-                        clients.add(result[i].getName());
+                    for (DFAgentDescription result1 : result) {
+                        clients.add(result1.getName());
                     }
                 } catch (FIPAException fe) {
                     // Si se captura una excepción, se avisa de ello:
@@ -70,9 +74,25 @@ public class BookAuctioneerAgent extends Agent {
                 }
                 
                 // Desde aquí, lo que hacemos es, para cada subasta, enviar peticiones a todos los clientes:
-                for(Map.Entry<Integer, Auction> entries: activeAuctions.entrySet()){
+                
+                // Será un mensaje cfp en todos los casos, así que lo reciclaremos:
+                ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
+                // La respuesta tampoco va a variar:
+                cfp.setReplyWith("cfp " + System.currentTimeMillis());
+                
+                activeAuctions.entrySet().stream().map(entries -> entries.getValue()).forEachOrdered(auction -> {
                     // Se recuperan los datos y se envían las peticiones pertinentes:
-                }
+                    // A cada usuario, una por subasta:
+                    // El contenido será la información de la subasta, que irá cambiando:
+                    // Se meten todos los agentes:
+                    clients.forEach(client -> cfp.addReceiver(client));
+                    // Se procede al envío de los mensajes:
+                    myAgent.send(cfp);
+                });
+                
+                // La recepción de propuestas se hará según este patrón:
+                mt = MessageTemplate.and(MessageTemplate.MatchConversationId("auction"),
+                        MessageTemplate.MatchInReplyTo(cfp.getReplyWith()));
             }
         });
     }
