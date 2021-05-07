@@ -12,10 +12,12 @@ import java.util.ArrayList;
  * Clase que representa una subasta de las que se realizarán.
  * @author Manuel Bendaña
  */
-public class Auction {
+public class AuctionData {
+    private Integer numRound;
     private Integer id;
     private String productName;
     private Float price;
+    private Float lastRoundPrice;
     private Float sum;
     private ArrayList<AID> roundParticipants;
     private ArrayList<AID> prevRoundParticipants;
@@ -27,13 +29,52 @@ public class Auction {
      * @param price El precio del producto
      * @param sum La suma de precio que se hace de cada vez
      */
-    public Auction(Integer id, String productName, Float price, Float sum) {
+    public AuctionData(Integer id, String productName, Float price, Float sum) {
         this.id = id;
         this.productName = productName;
         this.price = price;
+        this.lastRoundPrice = null;
         this.sum = sum;
+        // Se empezará siempre antes de la ronda 1:
+        this.numRound = 0;
     }
 
+    /**
+     * Método que permite obtener el ganador de una ronda.
+     * @return El nombre del ganador.
+     */
+    public String getRoundWinner() {
+        if(roundParticipants != null && prevRoundParticipants != null){
+            if(roundParticipants.size() >= 1){
+                // Si hay solo un participante o más, se devuelve el primero (o único):
+                return roundParticipants.get(0).getName();
+            } else {
+                // Si es 0, se devuelve el primero de la ronda anterior, si lo hay (si no se devuelve un string vacío):
+                return prevRoundParticipants.size() > 0 ? prevRoundParticipants.get(0).getName() : "";
+            }
+        } else {
+            return "";
+        }
+    }
+    
+    /**
+     * Método que permite validar la finalización de una subasta en base a los 
+     * participantes en la última ronda.
+     * @return True si se terminó, false en otro caso.
+     */
+    public boolean isAuctionFinished(){
+        if(roundParticipants != null && prevRoundParticipants != null){
+            // Comprobamos si en la ronda actual hay 1 o 0 participantes:
+            return roundParticipants.size() <= 1;
+        } else {
+            // Si aún no se han creado los arrays de participantes es que ni siquiera se ha hecho una ronda:
+            // En este punto, los instanciaremos (así en la siguiente vuelta fijo no serán null):
+            roundParticipants = new ArrayList<>();
+            prevRoundParticipants = new ArrayList<>();
+            return false;
+        }
+    }
+    
     /**
      * Método que permite recuperar el nombre del producto
      * @return El nombre del producto
@@ -129,4 +170,54 @@ public class Auction {
     public void setPrevRoundParticipants(ArrayList<AID> prevRoundParticipants) {
         this.prevRoundParticipants = prevRoundParticipants;
     }
+
+    /**
+     * Método que permite recuperar el precio de la anterior ronda.
+     * @return el precio de la ronda anterior.
+     */
+    public Float getLastRoundPrice() {
+        return lastRoundPrice;
+    }
+
+    /**
+     * Método que permite establecer el precio de la anterior ronda.
+     * @param lastRoundPrice el precio a establecer.
+     */
+    public void setLastRoundPrice(Float lastRoundPrice) {
+        this.lastRoundPrice = lastRoundPrice;
+    }
+
+    /**
+     * Método que permite recuperar el número de ronda.
+     * @return El número de ronda almacenado.
+     */
+    public Integer getNumRound() {
+        return numRound;
+    }
+
+    /**
+     * Método que permite establecer el número de ronda.
+     * @param numRound El número de ronda a establecer.
+     */
+    public void setNumRound(Integer numRound) {
+        this.numRound = numRound;
+    }
+    
+    /**
+     * Método que permite avanzar una subasta de ronda.
+     */
+    public void nextRound(){
+        this.numRound += 1;
+        // SI la ronda era 0 (pasa a 1), entonces el precio se mantiene (el inicial):
+        // Si es mayor, se suma.
+        if(this.numRound > 1){
+            // Además, se actualiza el precio de la ronda previa:
+            this.lastRoundPrice = this.price;
+            this.price += this.sum;
+            // Actualizamos arrays:
+            this.prevRoundParticipants = this.roundParticipants;
+            this.roundParticipants = new ArrayList<>();
+        }
+    }
+    
 }
