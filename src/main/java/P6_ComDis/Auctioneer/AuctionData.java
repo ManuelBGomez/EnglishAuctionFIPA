@@ -21,6 +21,7 @@ public class AuctionData {
     private Float sum;
     private ArrayList<AID> roundParticipants;
     private ArrayList<AID> prevRoundParticipants;
+    private Boolean isFinished;
 
     /**
      * Constructor de la clase
@@ -33,10 +34,12 @@ public class AuctionData {
         this.id = id;
         this.productName = productName;
         this.price = price;
-        this.lastRoundPrice = null;
+        this.lastRoundPrice = -1f;
         this.sum = sum;
         // Se empezará siempre antes de la ronda 1:
         this.numRound = 0;
+        // Siempre se empezará con una subasta no acabada:
+        this.isFinished = false;
     }
 
     /**
@@ -219,5 +222,20 @@ public class AuctionData {
             this.roundParticipants = new ArrayList<>();
         }
     }
-    
+
+    /**
+     * Método que permite saber si la subasta ha finalizado
+     * @return Booleano que indica si la subasta finalizó o no.
+     */
+    public Boolean getIsFinished() {
+        return isFinished;
+    }
+
+    /**
+     * Método que permite establecer si la subasta ha finalizado.
+     * @param isFinished Booleano que indica si la subasta finaliza o no.
+     */
+    public void setIsFinished(Boolean isFinished) {
+        this.isFinished = isFinished;
+    }
 }

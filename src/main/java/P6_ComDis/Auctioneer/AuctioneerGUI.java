@@ -7,6 +7,8 @@ package P6_ComDis.Auctioneer;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -14,11 +16,21 @@ import java.awt.Toolkit;
  */
 public class AuctioneerGUI extends javax.swing.JFrame {
 
+    private BookAuctioneerAgent auctioneer;
+    
     /**
      * Creates new form AuctioneerGUI
      */
-    public AuctioneerGUI() {
+    public AuctioneerGUI(BookAuctioneerAgent auctioneer) {
+        this.auctioneer = auctioneer;
+        
         initComponents();
+        
+        // Asociamos el modelo de tabla correspondiente
+        AuctioneerTableModel auctTM = new AuctioneerTableModel();
+        this.tableAuctions.setModel(auctTM);
+        
+        // Por defecto no se añadirán filas.
     }
 
     /**
@@ -33,20 +45,19 @@ public class AuctioneerGUI extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tableAuctions = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        bookName = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        bookPrice = new javax.swing.JTextField();
+        increment = new javax.swing.JTextField();
+        btnStartAuction = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1280, 720));
-        setPreferredSize(new java.awt.Dimension(1280, 720));
         setResizable(false);
         setSize(new java.awt.Dimension(1280, 720));
 
@@ -58,7 +69,7 @@ public class AuctioneerGUI extends javax.swing.JFrame {
         jLabel2.setText("Subastas actuales");
         jLabel2.setToolTipText("");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tableAuctions.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -69,9 +80,9 @@ public class AuctioneerGUI extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jTable1.setMinimumSize(new java.awt.Dimension(780, 670));
-        jTable1.setPreferredSize(null);
-        jScrollPane1.setViewportView(jTable1);
+        tableAuctions.setMinimumSize(new java.awt.Dimension(780, 670));
+        tableAuctions.setPreferredSize(null);
+        jScrollPane1.setViewportView(tableAuctions);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -85,7 +96,7 @@ public class AuctioneerGUI extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 663, Short.MAX_VALUE))
         );
 
         jPanel2.setMinimumSize(new java.awt.Dimension(500, 720));
@@ -102,8 +113,8 @@ public class AuctioneerGUI extends javax.swing.JFrame {
         jLabel3.setFocusable(false);
         jLabel3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTextField1.setToolTipText("Introduce un nombre...");
+        bookName.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        bookName.setToolTipText("Introduce un nombre...");
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -113,11 +124,17 @@ public class AuctioneerGUI extends javax.swing.JFrame {
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("Incremento (€)");
 
-        jButton1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButton1.setText("Subastar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        bookPrice.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                bookPriceActionPerformed(evt);
+            }
+        });
+
+        btnStartAuction.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnStartAuction.setText("Subastar");
+        btnStartAuction.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStartAuctionActionPerformed(evt);
             }
         });
 
@@ -130,25 +147,25 @@ public class AuctioneerGUI extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField1)
+                    .addComponent(bookName)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(10, 10, 10)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(bookPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
-                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                                .addComponent(increment, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(10, 10, 10)))))
                 .addContainerGap())
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(192, 192, 192)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnStartAuction, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -158,21 +175,21 @@ public class AuctioneerGUI extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(bookName, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-                    .addComponent(jTextField3))
+                    .addComponent(bookPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                    .addComponent(increment))
                 .addGap(36, 36, 36)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 391, Short.MAX_VALUE))
+                .addComponent(btnStartAuction, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 387, Short.MAX_VALUE))
         );
 
-        jTextField1.getAccessibleContext().setAccessibleName("bookNameInput");
+        bookName.getAccessibleContext().setAccessibleName("bookNameInput");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -196,9 +213,27 @@ public class AuctioneerGUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnStartAuctionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartAuctionActionPerformed
+        // Cuando se pulse el botón para subastar, se añadirá una subasta a la lista:
+        if(bookName != null && bookName.getText() != null && !bookName.getText().isEmpty() && 
+                bookPrice != null && bookPrice.getText() != null && !bookPrice.getText().isEmpty() &&  
+                increment != null && increment.getText() != null && !increment.getText().isEmpty()) {
+            
+            try {
+                Float price = Float.parseFloat(bookPrice.getText());
+
+                Float inc = Float.parseFloat(increment.getText());
+
+                auctioneer.addAuction(bookName.getText(), price, inc);
+            } catch (NumberFormatException ex) {
+                // Excepción por los parseFloat (si no hay datos tipo float, saltará).
+            }
+        }
+    }//GEN-LAST:event_btnStartAuctionActionPerformed
+
+    private void bookPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookPriceActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_bookPriceActionPerformed
 
     public void showGui() {
         pack();
@@ -209,8 +244,16 @@ public class AuctioneerGUI extends javax.swing.JFrame {
         super.setVisible(true);
     }
 
+    public void updateAuctions(HashMap<Integer, AuctionData> items) {
+        // Asociamos el array correspondiente:
+        ((AuctioneerTableModel) this.tableAuctions.getModel()).setAuctions(items.values().stream().collect(Collectors.toList()));
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JTextField bookName;
+    private javax.swing.JTextField bookPrice;
+    private javax.swing.JButton btnStartAuction;
+    private javax.swing.JTextField increment;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -219,9 +262,6 @@ public class AuctioneerGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTable tableAuctions;
     // End of variables declaration//GEN-END:variables
 }

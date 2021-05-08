@@ -7,12 +7,33 @@ package P6_ComDis.ontologia;
 * @author OntologyBeanGenerator v4.1
 * @version 2021/05/5, 21:39:32
 */
-public interface EndRound extends jade.content.AgentAction {
+public class EndRound implements jade.content.AgentAction {
+
+   private static final long serialVersionUID = -9098608021565808103L;
+
+  private String _internalInstanceName = null;
+
+  public EndRound() {
+    this._internalInstanceName = "";
+  }
+
+  public EndRound(String instance_name) {
+    this._internalInstanceName = instance_name;
+  }
+
+  public String toString() {
+    return _internalInstanceName;
+  }
 
    /**
    * Protege name: auctionRound
    */
-   public void setAuctionRound(AuctionRound value);
-   public AuctionRound getAuctionRound();
+   private AuctionRound auctionRound;
+   public void setAuctionRound(AuctionRound value) { 
+    this.auctionRound=value;
+   }
+   public AuctionRound getAuctionRound() {
+     return this.auctionRound;
+   }
 
 }
