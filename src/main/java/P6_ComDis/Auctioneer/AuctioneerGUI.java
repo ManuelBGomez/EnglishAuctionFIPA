@@ -240,13 +240,14 @@ public class AuctioneerGUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_bookPriceActionPerformed
 
-    public void showGui() {
+    public void showGui(String title) {
         pack();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int centerX = (int)screenSize.getWidth() / 2;
         int centerY = (int)screenSize.getHeight() / 2;
         setLocation(centerX - getWidth() / 2, centerY - getHeight() / 2);
         super.setVisible(true);
+        super.setTitle(title);
     }
 
     public void updateAuctions(HashMap<Integer, AuctionData> items) {

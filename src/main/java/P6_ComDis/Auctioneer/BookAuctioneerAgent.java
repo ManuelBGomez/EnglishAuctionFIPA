@@ -56,7 +56,7 @@ public class BookAuctioneerAgent extends Agent {
         this.numAuctions = 0;
         this.activeAuctions = new HashMap<>();
         this.auctioneerGUI = new AuctioneerGUI(this);
-        this.auctioneerGUI.showGui();
+        this.auctioneerGUI.showGui("Subastador " + getAID().getName());
         
         // Instanciamos codec (SL):
         this.codec = new SLCodec();

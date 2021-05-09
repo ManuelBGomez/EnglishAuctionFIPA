@@ -50,7 +50,7 @@ public class AuctionParticipantAgent extends Agent {
         // Inicialización:
         this.desiredBooks = new ArrayList<>();
         this.clientGUI = new ClientGUI(this);
-        this.clientGUI.showGui();
+        this.clientGUI.showGui("Cliente " + getAID().getName());
         
         // Instanciamos codec (SL):
         this.codec = new SLCodec();
