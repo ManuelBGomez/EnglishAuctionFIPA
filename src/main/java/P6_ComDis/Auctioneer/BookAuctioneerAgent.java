@@ -72,7 +72,7 @@ public class BookAuctioneerAgent extends Agent {
         this.addBehaviour(new TickerBehaviour(this, INTERVAL) {
             @Override
             public void onTick() {
-                System.out.println("Recuperando clientes disponibles");
+                auctioneerGUI.addLog("Recuperando clientes disponibles");
                 
                 // Usaremos este tickerbehaviour para actualizar la lista de compradores:
                 DFAgentDescription template = new DFAgentDescription();
@@ -97,7 +97,7 @@ public class BookAuctioneerAgent extends Agent {
                     }
                 } catch (FIPAException fe) {
                     // Si se captura una excepción, se avisa de ello:
-                    System.out.println("Error al recuperar los agentes: " + fe.getMessage());
+                    auctioneerGUI.addLog("Error al recuperar los agentes: " + fe.getMessage());
                 }
                 
                 activeAuctions.entrySet().stream().map(entries -> entries.getValue()).forEachOrdered(auction -> {
@@ -130,7 +130,7 @@ public class BookAuctioneerAgent extends Agent {
                                 getContentManager().fillContent(inf, new Action(getAID(), ea));
                                 getContentManager().fillContent(req, new Action(getAID(), ea));
                             } catch (CodecException | OntologyException ex){
-                                System.out.println("Error enviando mensajes inform y request: " + ex.getMessage());
+                                auctioneerGUI.addLog("Error enviando mensajes inform y request: " + ex.getMessage());
                             }
 
                             // Iteramos por todos los participantes:
@@ -150,6 +150,13 @@ public class BookAuctioneerAgent extends Agent {
 
                             // Se establece el fin de la subasta:
                             auction.setIsFinished(true);
+
+                            if(ac.getActualWinner() == null || ac.getActualWinner().isEmpty()){
+                                auctioneerGUI.addLog("Fin de la subasta " + auction.getId() + ". Nadie ha participado.");
+                            } else {
+                                auctioneerGUI.addLog("Fin de la subasta " + auction.getId() + ". El libro " + auction.getProductName()
+                                                + " ha sido ganado por " + auction.getRoundWinner() + ", pagando " + ac.getActualPrice() + "€.");
+                            }
                         } else {
                             // Lo primero es devolver una respuesta a los interesados de la ronda anterior:
                             // Para cada subasta, miraremos si hubo ronda previa y actuaremos en consecuencia.
@@ -179,7 +186,7 @@ public class BookAuctioneerAgent extends Agent {
                                     getContentManager().fillContent(ap, new Action(getAID(), er));
                                     getContentManager().fillContent(rp, new Action(getAID(), er));
                                 } catch (CodecException | OntologyException ex){
-                                    System.out.println("Error enviando mensajes accept y reject proposal: " + ex.getMessage());
+                                    auctioneerGUI.addLog("Error enviando mensajes accept y reject proposal: " + ex.getMessage());
                                 }
 
                                 // Enviaremos el accept proposal al agente ganador de esta ronda, evidentemente:
@@ -196,6 +203,8 @@ public class BookAuctioneerAgent extends Agent {
                                 // Enviamos mensajes y avanzamos de ronda:
                                 myAgent.send(ap);
                                 myAgent.send(rp);
+                                auctioneerGUI.addLog("El actor " + auction.getRoundWinner() + " gana la ronda en la subasta del libro " 
+                                        + auction.getProductName() + " por " + auction.getPrice() + "€.");
 
                             }
                             auction.nextRound();
@@ -223,14 +232,15 @@ public class BookAuctioneerAgent extends Agent {
                                 // Creado el agentaction y los concepts necesarios, se introducen en el mensaje:
                                 getContentManager().fillContent(cfp, new Action(getAID(), of));
                             } catch (CodecException | OntologyException ex){
-                                System.out.println("Error enviando el mensaje cfp: " + ex.getMessage());
-                                ex.printStackTrace();
+                                auctioneerGUI.addLog("Error enviando el mensaje cfp: " + ex.getMessage());
                             }
 
                             // Se establecen los destinatarios
                             clients.forEach(client -> cfp.addReceiver(client));
                             // Se procede al envío de los mensajes:
                             myAgent.send(cfp);
+                            auctioneerGUI.addLog("Enviada solicitud de ronda de la subasta " + auction.getId() + " del libro " 
+                                    + auction.getProductName() + " por " + auction.getPrice() + "€.");
                         }
                     }
                     
@@ -279,6 +289,8 @@ public class BookAuctioneerAgent extends Agent {
                 activeAuctions.put(auctionData.getId(), auctionData);
                 // Actualizamos la interfaz:
                 auctioneerGUI.updateAuctions(activeAuctions);
+                auctioneerGUI.addLog("Añadida nueva subasta del libro " + bookName + ", con precio inicial " + price + 
+                        "€ e incremento de " + step + "€ por ronda.");
             }
         });
     }

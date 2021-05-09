@@ -17,13 +17,13 @@ import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import java.awt.Color;
 import java.util.ArrayList;
 
 /**
@@ -79,10 +79,10 @@ public class AuctionParticipantAgent extends Agent {
         try {
             // Procedemos al registro:
             DFService.register(this, dfd);
-            clientGUI.addLog("Agente registrado en el DF.", 0);
+            clientGUI.addLog("Agente registrado en el DF.");
         } catch(FIPAException e){
             // En caso de excepción se muestra un mensaje:
-            clientGUI.addLog("Error registrándose en DF: " + e.getMessage(), 0);
+            clientGUI.addLog("Error registrándose en DF: " + e.getMessage());
         }
         
         // Definimos plantilla de recepción de los mensajes:
@@ -99,13 +99,18 @@ public class AuctionParticipantAgent extends Agent {
      * @param price El precio máximo que se está dispuesto a pagar.
      */
     void addDesiredBook(String title, Float price) {
-        // Creamos el objeto:
-        DesiredBook newBook = new DesiredBook(title, price);
-        // Lo añadimos al array:
-        desiredBooks.add(newBook);
-        // Informamos del final:
-        clientGUI.addLog("Añadido interés por el libro " + newBook.getBookName()
-                + " con un tope de " + newBook.getMaxPrice() + "€.", 0);
+        addBehaviour(new OneShotBehaviour() {
+            @Override
+            public void action() {
+                // Creamos el objeto:
+                DesiredBook newBook = new DesiredBook(title, price);
+                // Lo añadimos al array:
+                desiredBooks.add(newBook);
+                // Informamos del final:
+                clientGUI.addLog("Añadido interés por el libro " + newBook.getBookName()
+                        + " con un tope de " + newBook.getMaxPrice() + "€.");
+            }
+        });
     }
     
     /**
@@ -148,7 +153,7 @@ public class AuctionParticipantAgent extends Agent {
                                         myAgent.send(resp);
                                         clientGUI.addLog("Pujando " + of.getAuctionRound().getRoundPrice() 
                                                 + "€ en la subasta del libro " + of.getAuctionRound().getAuction().getBook() 
-                                                + " del agente " + a.getActor().getName(), 0);
+                                                + " del agente " + a.getActor().getName());
                                         // Se sale del bucle:
                                         break;
                                     }
@@ -167,7 +172,7 @@ public class AuctionParticipantAgent extends Agent {
                             EndRound er = (EndRound) a.getAction();
                             clientGUI.addLog("Perdida puja por " + er.getAuctionRound().getRoundPrice() 
                                     + "€ en la subasta del libro " + er.getAuctionRound().getAuction().getBook() 
-                                    + " del agente " + a.getActor().getName(), 0);
+                                    + " del agente " + a.getActor().getName());
                             
                             // Notificamos a la interfaz la llegada de esta subasta:
                             clientGUI.addTableRow(new AuctionClientData(er.getAuctionRound().getAuction().getAuctionID(),
@@ -182,7 +187,7 @@ public class AuctionParticipantAgent extends Agent {
                             EndRound endR = (EndRound) a.getAction();
                             clientGUI.addLog("Ganada puja por " + endR.getAuctionRound().getRoundPrice() 
                                     + "€ en la subasta del libro " + endR.getAuctionRound().getAuction().getBook() 
-                                    + " del agente " + a.getActor().getName(), 0);
+                                    + " del agente " + a.getActor().getName());
                             
                             // Notificamos a la interfaz la llegada de esta subasta:
                             clientGUI.addTableRow(new AuctionClientData(endR.getAuctionRound().getAuction().getAuctionID(),
@@ -208,7 +213,7 @@ public class AuctionParticipantAgent extends Agent {
                                         as));
                             // Informamos del final:
                             clientGUI.addLog("Perdida subasta del libro " + ea.getAuction().getBook() 
-                                    + " del subastador " + a.getActor().getName(), 1);
+                                    + " del subastador " + a.getActor().getName());
                             break;
                         case ACLMessage.REQUEST:
                             EndAuction endAuc = (EndAuction) a.getAction();
@@ -222,7 +227,7 @@ public class AuctionParticipantAgent extends Agent {
                                         AuctionState.GANADA));
                             // Informamos del final
                             clientGUI.addLog("Ganada subasta del libro " + endAuc.getAuction().getBook() 
-                                    + " del subastador " + a.getActor().getName() + " por " + endAuc.getAuction().getActualPrice() + "€.", 2);
+                                    + " del subastador " + a.getActor().getName() + " por " + endAuc.getAuction().getActualPrice() + "€.");
                             break;
                         default:
                             break;

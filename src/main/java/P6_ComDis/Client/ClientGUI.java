@@ -5,12 +5,8 @@
  */
 package P6_ComDis.Client;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
 
 /**
  * Interfaz gráfica del cliente
@@ -28,14 +24,6 @@ public class ClientGUI extends javax.swing.JFrame {
         this.client = client;
         
         initComponents();
-        
-        // Estilos del textpane:
-        Style styleR = logText.addStyle("Red", null);
-        Style styleB = logText.addStyle("Black", null);
-        Style styleG = logText.addStyle("Green", null);
-        StyleConstants.setForeground(styleR, Color.red);
-        StyleConstants.setForeground(styleB, Color.black);
-        StyleConstants.setForeground(styleG, Color.green);
         
         // Asociamos el modelo de tabla correspondiente
         ClientTableModel clitTM = new ClientTableModel();
@@ -65,7 +53,7 @@ public class ClientGUI extends javax.swing.JFrame {
         bookPrice = new javax.swing.JTextField();
         btnRequest = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        logText = new javax.swing.JTextPane();
+        logText = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1280, 720));
@@ -151,6 +139,11 @@ public class ClientGUI extends javax.swing.JFrame {
         });
 
         logText.setEditable(false);
+        logText.setColumns(20);
+        logText.setFont(new java.awt.Font("Monospaced", 1, 13)); // NOI18N
+        logText.setLineWrap(true);
+        logText.setRows(5);
+        logText.setWrapStyleWord(true);
         jScrollPane3.setViewportView(logText);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -192,8 +185,8 @@ public class ClientGUI extends javax.swing.JFrame {
                 .addComponent(bookPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36)
                 .addComponent(btnRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -236,11 +229,11 @@ public class ClientGUI extends javax.swing.JFrame {
             } catch (NumberFormatException ex) {
                 // Excepción por los parseFloat (si no hay datos tipo float, saltará).
                 // Informamos del error:
-                this.addLog("No se ha introducido un precio válido", 1);
+                this.addLog("No se ha introducido un precio válido");
             }
         } else {
             // Informamos del error:
-            this.addLog("Debes introducir un nombre de libro y un precio válido", 1);
+            this.addLog("Debes introducir un nombre de libro y un precio válido");
         }
     }//GEN-LAST:event_btnRequestActionPerformed
 
@@ -274,7 +267,7 @@ public class ClientGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTextPane logText;
+    private javax.swing.JTextArea logText;
     private javax.swing.JTable tableAuctions;
     // End of variables declaration//GEN-END:variables
 
@@ -291,20 +284,7 @@ public class ClientGUI extends javax.swing.JFrame {
      * Método que permite añadir un mensaje al cuadro del log
      * @param message El mensaje a añadir
      */
-    void addLog(String message, Integer type){
-        try {
-            switch(type){
-                case 0:
-                    logText.getStyledDocument().insertString(logText.getStyledDocument().getLength(), message + "\n", logText.getStyle("black"));
-                    break;
-                case 1:
-                    logText.getStyledDocument().insertString(logText.getStyledDocument().getLength(), message + "\n", logText.getStyle("red"));
-                    break;
-                default:
-                    logText.getStyledDocument().insertString(logText.getStyledDocument().getLength(), message + "\n", logText.getStyle("green"));
-                    break;
-            }
-        } catch(BadLocationException ex){ System.out.println("Error insertando mensaje: " + ex.getMessage() + "."); }
-        
+    void addLog(String message){
+        logText.setText(logText.getText() + message + "\n");
     }
 }

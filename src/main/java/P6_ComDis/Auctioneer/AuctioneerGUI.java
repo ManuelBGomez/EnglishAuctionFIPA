@@ -20,6 +20,7 @@ public class AuctioneerGUI extends javax.swing.JFrame {
     
     /**
      * Creates new form AuctioneerGUI
+     * @param auctioneer Referencia al agente subastador
      */
     public AuctioneerGUI(BookAuctioneerAgent auctioneer) {
         this.auctioneer = auctioneer;
@@ -55,6 +56,8 @@ public class AuctioneerGUI extends javax.swing.JFrame {
         bookPrice = new javax.swing.JTextField();
         increment = new javax.swing.JTextField();
         btnStartAuction = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        logText = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1280, 720));
@@ -138,12 +141,24 @@ public class AuctioneerGUI extends javax.swing.JFrame {
             }
         });
 
+        logText.setEditable(false);
+        logText.setColumns(20);
+        logText.setFont(new java.awt.Font("Monospaced", 1, 13)); // NOI18N
+        logText.setLineWrap(true);
+        logText.setRows(5);
+        logText.setWrapStyleWord(true);
+        jScrollPane3.setViewportView(logText);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(192, 192, 192)
+                .addComponent(btnStartAuction, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -161,12 +176,9 @@ public class AuctioneerGUI extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                                 .addComponent(increment, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, 10)))))
+                                .addGap(10, 10, 10))))
+                    .addComponent(jScrollPane3))
                 .addContainerGap())
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(192, 192, 192)
-                .addComponent(btnStartAuction, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -186,7 +198,9 @@ public class AuctioneerGUI extends javax.swing.JFrame {
                     .addComponent(increment))
                 .addGap(36, 36, 36)
                 .addComponent(btnStartAuction, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 387, Short.MAX_VALUE))
+                .addGap(13, 13, 13)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         bookName.getAccessibleContext().setAccessibleName("bookNameInput");
@@ -232,7 +246,12 @@ public class AuctioneerGUI extends javax.swing.JFrame {
                 increment.setText("");
             } catch (NumberFormatException ex) {
                 // Excepción por los parseFloat (si no hay datos tipo float, saltará).
+                // Informamos del error:
+                this.addLog("No se ha introducido un precio o paso válido");
             }
+        } else {
+            // Informamos del error:
+            this.addLog("Debes introducir un nombre de libro, un precio y un paso válidos");
         }
     }//GEN-LAST:event_btnStartAuctionActionPerformed
 
@@ -268,6 +287,17 @@ public class AuctioneerGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextArea logText;
     private javax.swing.JTable tableAuctions;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * Método que permite añadir un mensaje al cuadro del log
+     * @param message El mensaje a añadir
+     */
+    public void addLog(String message){
+        logText.setText(logText.getText() + message + "\n");
+    }
 }
+

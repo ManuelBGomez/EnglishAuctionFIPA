@@ -75,7 +75,7 @@ public class ClientTableModel extends AbstractTableModel{
         switch (col){
             case 0: cl = Integer.class; break;
             case 1: cl = String.class; break;
-            case 2: cl = Float.class; break;
+            case 2: cl = String.class; break;
             case 3: cl = String.class; break;
             case 4: cl = String.class; break;
             case 5: cl = String.class; break;
