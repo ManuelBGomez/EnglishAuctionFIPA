@@ -122,6 +122,32 @@ public class ClientTableModel extends AbstractTableModel{
     }
     
     /**
+     * Método que permite añadir una subasta a la lista
+     * @param auction La subasta a añadir.
+     */
+    public void addAuction(AuctionClientData auction) {
+        int i;
+        for(i = 0; i < auctions.size(); i++){
+            // Buscamos una subasta del mismo subastador con el mismo id, que esté marcada en progreso:
+            if(auction.getId().equals(auctions.get(i).getId()) &&
+                auction.getAuctioneer().equals(auctions.get(i).getAuctioneer()) &&
+                auctions.get(i).getState().equals(AuctionState.EN_PROGRESO)) {
+                // Si la encontramos, paramos el bucle:
+                break;
+            }
+        }
+        
+        // Si i supera el tamaño del número de subastas, la subasta se añade:
+        if(i >= auctions.size()) {
+            auctions.add(auction);
+        } else {
+            // En otro caso, se hace reemplazo en la posición correspondiente:
+            auctions.set(i, auction);
+        }
+        fireTableDataChanged();
+    }
+    
+    /**
      * Método que permite recuperar una de las subastas almacenadas
      * @param i El índice de la subasta a recuperar.
      * @return La información de la subasta correspondiente.

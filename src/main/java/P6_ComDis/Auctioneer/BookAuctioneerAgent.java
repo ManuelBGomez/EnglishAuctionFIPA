@@ -195,9 +195,9 @@ public class BookAuctioneerAgent extends Agent {
                                 myAgent.send(ap);
                                 myAgent.send(rp);
 
-                                auction.nextRound();
                             }
-
+                            auction.nextRound();
+                            
                             // Hecho lo anterior, se recuperan los datos y se envían las peticiones pertinentes:
                             // A cada usuario, una por subasta:
                             Auction ac = new Auction();

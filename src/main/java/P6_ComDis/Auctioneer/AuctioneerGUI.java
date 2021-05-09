@@ -225,6 +225,11 @@ public class AuctioneerGUI extends javax.swing.JFrame {
                 Float inc = Float.parseFloat(increment.getText());
 
                 auctioneer.addAuction(bookName.getText(), price, inc);
+                
+                // Limpiamos
+                bookName.setText("");
+                bookPrice.setText("");
+                increment.setText("");
             } catch (NumberFormatException ex) {
                 // Excepción por los parseFloat (si no hay datos tipo float, saltará).
             }

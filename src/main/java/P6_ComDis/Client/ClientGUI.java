@@ -5,12 +5,16 @@
  */
 package P6_ComDis.Client;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
 
 /**
- *
- * @author manub
+ * Interfaz gráfica del cliente
+ * @author Manuel Bendaña
  */
 public class ClientGUI extends javax.swing.JFrame {
 
@@ -18,11 +22,20 @@ public class ClientGUI extends javax.swing.JFrame {
     
     /**
      * Creates new form AuctioneerGUI
+     * @param client Agente cliente que usa la interfaz.
      */
     public ClientGUI(AuctionParticipantAgent client) {
         this.client = client;
         
         initComponents();
+        
+        // Estilos del textpane:
+        Style styleR = logText.addStyle("Red", null);
+        Style styleB = logText.addStyle("Black", null);
+        Style styleG = logText.addStyle("Green", null);
+        StyleConstants.setForeground(styleR, Color.red);
+        StyleConstants.setForeground(styleB, Color.black);
+        StyleConstants.setForeground(styleG, Color.green);
         
         // Asociamos el modelo de tabla correspondiente
         ClientTableModel clitTM = new ClientTableModel();
@@ -51,6 +64,8 @@ public class ClientGUI extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         bookPrice = new javax.swing.JTextField();
         btnRequest = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        logText = new javax.swing.JTextPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1280, 720));
@@ -135,6 +150,9 @@ public class ClientGUI extends javax.swing.JFrame {
             }
         });
 
+        logText.setEditable(false);
+        jScrollPane3.setViewportView(logText);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -144,19 +162,21 @@ public class ClientGUI extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(192, 192, 192)
+                                .addComponent(btnRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(176, 176, 176)
+                                .addComponent(bookPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 165, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(bookName)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(192, 192, 192)
-                        .addComponent(btnRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane3))))
                 .addContainerGap())
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(176, 176, 176)
-                .addComponent(bookPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(177, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -172,7 +192,9 @@ public class ClientGUI extends javax.swing.JFrame {
                 .addComponent(bookPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36)
                 .addComponent(btnRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 387, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         bookName.getAccessibleContext().setAccessibleName("bookNameInput");
@@ -207,9 +229,18 @@ public class ClientGUI extends javax.swing.JFrame {
                 Float price = Float.parseFloat(bookPrice.getText());
 
                 client.addDesiredBook(bookName.getText(), price);
+                
+                // Limpiamos:
+                bookName.setText("");
+                bookPrice.setText("");
             } catch (NumberFormatException ex) {
                 // Excepción por los parseFloat (si no hay datos tipo float, saltará).
+                // Informamos del error:
+                this.addLog("No se ha introducido un precio válido", 1);
             }
+        } else {
+            // Informamos del error:
+            this.addLog("Debes introducir un nombre de libro y un precio válido", 1);
         }
     }//GEN-LAST:event_btnRequestActionPerformed
 
@@ -241,6 +272,38 @@ public class ClientGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextPane logText;
     private javax.swing.JTable tableAuctions;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * Método que permite añadir una fila a la tabla de subastas.
+     * @param auctionClientData Los datos de la fila a añadir.
+     */
+    void addTableRow(AuctionClientData auctionClientData) {
+        // Añadimos auctionclientdata al modelo:
+        ((ClientTableModel) tableAuctions.getModel()).addAuction(auctionClientData);
+    }
+    
+    /**
+     * Método que permite añadir un mensaje al cuadro del log
+     * @param message El mensaje a añadir
+     */
+    void addLog(String message, Integer type){
+        try {
+            switch(type){
+                case 0:
+                    logText.getStyledDocument().insertString(logText.getStyledDocument().getLength(), message + "\n", logText.getStyle("black"));
+                    break;
+                case 1:
+                    logText.getStyledDocument().insertString(logText.getStyledDocument().getLength(), message + "\n", logText.getStyle("red"));
+                    break;
+                default:
+                    logText.getStyledDocument().insertString(logText.getStyledDocument().getLength(), message + "\n", logText.getStyle("green"));
+                    break;
+            }
+        } catch(BadLocationException ex){ System.out.println("Error insertando mensaje: " + ex.getMessage() + "."); }
+        
+    }
 }
