@@ -7,6 +7,10 @@ package P6_ComDis.Client;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Interfaz gráfica del cliente
@@ -285,6 +289,13 @@ public class ClientGUI extends javax.swing.JFrame {
      * @param message El mensaje a añadir
      */
     void addLog(String message){
-        logText.setText(logText.getText() + message + "\n");
+        // Recuperaremos fecha y hora actuales para asignarlas:
+        // Definimos el patrón y el formato de fecha
+        String pattern = "[MM/dd/yyyy-HH:mm:ss] ";
+        DateFormat df = new SimpleDateFormat(pattern);
+        // Tomamos fecha actual:
+        Date today = Calendar.getInstance().getTime();
+        
+        logText.setText(logText.getText() + df.format(today) + message + "\n");
     }
 }
