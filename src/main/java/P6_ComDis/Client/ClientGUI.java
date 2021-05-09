@@ -200,7 +200,17 @@ public class ClientGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRequestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRequestActionPerformed
-        
+        // Hacemos que se añada la solicitud al array pertinente (si procede):
+        if(bookName != null && bookName.getText() != null && !bookName.getText().isEmpty() && 
+                bookPrice != null && bookPrice.getText() != null && !bookPrice.getText().isEmpty()) {
+            try {
+                Float price = Float.parseFloat(bookPrice.getText());
+
+                client.addDesiredBook(bookName.getText(), price);
+            } catch (NumberFormatException ex) {
+                // Excepción por los parseFloat (si no hay datos tipo float, saltará).
+            }
+        }
     }//GEN-LAST:event_btnRequestActionPerformed
 
     private void bookPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookPriceActionPerformed

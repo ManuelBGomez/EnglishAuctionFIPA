@@ -45,6 +45,7 @@ public class AuctionParticipantAgent extends Agent {
         // Inicialización:
         this.desiredBooks = new ArrayList<>();
         this.clientGUI = new ClientGUI(this);
+        this.clientGUI.showGui();
         
         // Instanciamos codec (SL):
         this.codec = new SLCodec();
@@ -62,6 +63,18 @@ public class AuctionParticipantAgent extends Agent {
         
         // Añadimos behaviour de recepción de mensajes:
         this.addBehaviour(new ManageAuctioneersRequests());
+    }
+
+    /**
+     * Método que permite añadir un libro deseado por el cliente.
+     * @param title El nombre del libro que se desea adquirir.
+     * @param price El precio máximo que se está dispuesto a pagar.
+     */
+    void addDesiredBook(String title, Float price) {
+        // Creamos el objeto:
+        DesiredBook newBook = new DesiredBook(title, price);
+        // Lo añadimos al array:
+        desiredBooks.add(newBook);
     }
     
     /**
@@ -113,18 +126,14 @@ public class AuctionParticipantAgent extends Agent {
                             EndRound er = (EndRound) a.getAction();
                             break;
                         case ACLMessage.INFORM:
-                            {
-                                // Se ha perdido esta subasta, por lo que se avisa y se mantiene el libro dentro de los deseados:
-                                EndAuction ea = (EndAuction) a.getAction();
-                                break;
-                            }
+                            // Se ha perdido esta subasta, por lo que se avisa y se mantiene el libro dentro de los deseados:
+                            EndAuction ea = (EndAuction) a.getAction();
+                            break;
                         case ACLMessage.REQUEST:
-                            {
-                                EndAuction ea = (EndAuction) a.getAction();
-                                // Se ha ganado esta subasta, por lo que se avisa a la interfaz y se elimina el libro de los deseados:
-                                desiredBooks.removeIf(book -> book.getBookName().equals(ea.getAuction().getBook()));
-                                break;
-                            }
+                            EndAuction endAuc = (EndAuction) a.getAction();
+                            // Se ha ganado esta subasta, por lo que se avisa a la interfaz y se elimina el libro de los deseados:
+                            desiredBooks.removeIf(book -> book.getBookName().equals(endAuc.getAuction().getBook()));
+                            break;
                         default:
                             break;
                     }
