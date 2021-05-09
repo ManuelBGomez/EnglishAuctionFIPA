@@ -107,7 +107,9 @@ public class BookAuctioneerAgent extends Agent {
                         if(auction.isAuctionFinished()){
                             // Si ha terminado, enviaremos un mensaje de final de subasta a todos los usuarios:
                             Auction ac = new Auction();
-                            ac.setActualPrice(auction.getLastRoundPrice());
+                            // El precio final puede variar en función de si gana un participante de la ronda actual o de la previa:
+                            if(auction.getRoundParticipants().isEmpty()) ac.setActualPrice(auction.getLastRoundPrice());
+                            else ac.setActualPrice(auction.getPrice());
                             ac.setActualWinner(auction.getRoundWinner());
                             ac.setAuctionID(auction.getId());
                             ac.setBook(auction.getProductName());

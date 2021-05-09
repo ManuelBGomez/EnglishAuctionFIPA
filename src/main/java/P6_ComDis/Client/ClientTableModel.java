@@ -55,7 +55,7 @@ public class ClientTableModel extends AbstractTableModel{
             case 0: nombre = "Id subasta"; break;
             case 1: nombre = "Libro"; break;
             case 2: nombre = "Precio actual"; break;
-            case 3: nombre = "Ganador actual"; break;
+            case 3: nombre = "Ganador previo"; break;
             case 4: nombre = "Subastador"; break;
             case 5: nombre = "Estado"; break;
         }
@@ -95,8 +95,8 @@ public class ClientTableModel extends AbstractTableModel{
         switch (columnIndex) {
             case 0: result = auctions.get(rowIndex).getId(); break;
             case 1: result = auctions.get(rowIndex).getProductName(); break;
-            case 2: result = auctions.get(rowIndex).getPrice(); break;
-            case 3: result = auctions.get(rowIndex).getRoundWinner(); break;
+            case 2: result = auctions.get(rowIndex).getPrice() < 0 ? "-" : auctions.get(rowIndex).getPrice() ; break;
+            case 3: result = auctions.get(rowIndex).getRoundWinner().isEmpty() ? "-" : auctions.get(rowIndex).getRoundWinner(); break;
             case 4: result = auctions.get(rowIndex).getAuctioneer(); break;
             case 5: result = auctions.get(rowIndex).getState(); break;
         }
