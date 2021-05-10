@@ -55,7 +55,7 @@ public class ClientTableModel extends AbstractTableModel{
             case 0: nombre = "Id subasta"; break;
             case 1: nombre = "Libro"; break;
             case 2: nombre = "Precio actual"; break;
-            case 3: nombre = "Ganador previo"; break;
+            case 3: nombre = "Ganador actual"; break;
             case 4: nombre = "Subastador"; break;
             case 5: nombre = "Estado"; break;
         }

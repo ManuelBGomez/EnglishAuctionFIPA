@@ -72,34 +72,6 @@ public class BookAuctioneerAgent extends Agent {
         this.addBehaviour(new TickerBehaviour(this, INTERVAL) {
             @Override
             public void onTick() {
-                auctioneerGUI.addLog("Recuperando clientes disponibles");
-                
-                // Usaremos este tickerbehaviour para actualizar la lista de compradores:
-                DFAgentDescription template = new DFAgentDescription();
-                ServiceDescription sd = new ServiceDescription();
-                
-                sd.setType("auction");
-                
-                // Asociamos a la DFAgentDescription el servicio de subastas.
-                // LOs vendedores interesados se añadirán:
-                template.addServices(sd);
-                
-                // Hacemos la búsqueda de los agentes:
-                try {
-                    // Introducimos este agente y la plantilla elaborada previamente:
-                    DFAgentDescription[] result = DFService.search(myAgent, template);
-                    
-                    clients = new ArrayList<>();
-                    
-                    // Para cada agente encontrado se recupera su AID:
-                    for (DFAgentDescription result1 : result) {
-                        clients.add(result1.getName());
-                    }
-                } catch (FIPAException fe) {
-                    // Si se captura una excepción, se avisa de ello:
-                    auctioneerGUI.addLog("Error al recuperar los agentes: " + fe.getMessage());
-                }
-                
                 activeAuctions.entrySet().stream().map(entries -> entries.getValue()).forEachOrdered(auction -> {
                     // Si se ha marcado el booleano de terminada, no se hace nada en esta iteración (la subasta ya estará terminada):
                     if(!auction.getIsFinished()){
@@ -113,6 +85,8 @@ public class BookAuctioneerAgent extends Agent {
                             ac.setActualWinner(auction.getRoundWinner());
                             ac.setAuctionID(auction.getId());
                             ac.setBook(auction.getProductName());
+                            // Dejaremos el precio final en el de la ronda previa:
+                            auction.setPrice(ac.getActualPrice());
                             // Se usa un agentaction específico de la finalización:
                             EndAuction ea = new EndAuction();
                             ea.setAuction(ac);
@@ -208,52 +182,86 @@ public class BookAuctioneerAgent extends Agent {
 
                             }
                             auction.nextRound();
-                            
-                            // Hecho lo anterior, se recuperan los datos y se envían las peticiones pertinentes:
-                            // A cada usuario, una por subasta:
-                            Auction ac = new Auction();
-                            ac.setActualPrice(auction.getLastRoundPrice());
-                            ac.setActualWinner(auction.getRoundWinner());
-                            ac.setAuctionID(auction.getId());
-                            ac.setBook(auction.getProductName());
-                            AuctionRound ar = new AuctionRound();
-                            ar.setAuction(ac);
-                            ar.setRoundPrice(auction.getPrice());
-                            Offer of = new Offer();
-                            of.setAuctionRound(ar);
-
-                            // Será un mensaje cfp para enviar solicitud de ronda de subasta:
-                            ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
-                            // La ontología y el lenguaje no variarán:
-                            cfp.setOntology(onto.getName());
-                            cfp.setLanguage(codec.getName());
-
-                            try {
-                                // Creado el agentaction y los concepts necesarios, se introducen en el mensaje:
-                                getContentManager().fillContent(cfp, new Action(getAID(), of));
-                            } catch (CodecException | OntologyException ex){
-                                auctioneerGUI.addLog("Error enviando el mensaje cfp: " + ex.getMessage());
-                            }
-
-                            // Se establecen los destinatarios
-                            clients.forEach(client -> cfp.addReceiver(client));
-                            // Se procede al envío de los mensajes:
-                            myAgent.send(cfp);
-                            auctioneerGUI.addLog("Enviada solicitud de ronda de la subasta " + auction.getId() + " del libro " 
-                                    + auction.getProductName() + " por " + auction.getPrice() + "€.");
                         }
                     }
-                    
                 });
                 
-                // La recepción de propuestas se hará según este patrón:
-                mt = MessageTemplate.and(MessageTemplate.MatchOntology(onto.getName()),
-                        MessageTemplate.MatchLanguage(codec.getName()));
+                auctioneerGUI.addLog("Recuperando clientes disponibles");
+                
+                // Usaremos este tickerbehaviour para actualizar la lista de compradores:
+                DFAgentDescription template = new DFAgentDescription();
+                ServiceDescription sd = new ServiceDescription();
+                
+                sd.setType("auction");
+                
+                // Asociamos a la DFAgentDescription el servicio de subastas.
+                // LOs vendedores interesados se añadirán:
+                template.addServices(sd);
+                
+                // Hacemos la búsqueda de los agentes:
+                try {
+                    // Introducimos este agente y la plantilla elaborada previamente:
+                    DFAgentDescription[] result = DFService.search(myAgent, template);
+                    
+                    clients = new ArrayList<>();
+                    
+                    // Para cada agente encontrado se recupera su AID:
+                    for (DFAgentDescription result1 : result) {
+                        clients.add(result1.getName());
+                    }
+                } catch (FIPAException fe) {
+                    // Si se captura una excepción, se avisa de ello:
+                    auctioneerGUI.addLog("Error al recuperar los agentes: " + fe.getMessage());
+                }
+                
+                
+                // Ahora, iteramos de nuevo por los agentes para empezar una nueva ronda:
+                activeAuctions.entrySet().stream().map(entries -> entries.getValue()).forEachOrdered(auction -> {
+                    // Si se ha marcado el booleano de terminada, no se hace nada en esta iteración (la subasta ya estará terminada):
+                    if(!auction.getIsFinished()){
+                        // Hecho lo anterior, se recuperan los datos y se envían las peticiones pertinentes:
+                        // A cada usuario, una por subasta:
+                        Auction ac = new Auction();
+                        ac.setActualPrice(auction.getLastRoundPrice());
+                        ac.setActualWinner(auction.getRoundWinner());
+                        ac.setAuctionID(auction.getId());
+                        ac.setBook(auction.getProductName());
+                        AuctionRound ar = new AuctionRound();
+                        ar.setAuction(ac);
+                        ar.setRoundPrice(auction.getPrice());
+                        Offer of = new Offer();
+                        of.setAuctionRound(ar);
+
+                        // Será un mensaje cfp para enviar solicitud de ronda de subasta:
+                        ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
+                        // La ontología y el lenguaje no variarán:
+                        cfp.setOntology(onto.getName());
+                        cfp.setLanguage(codec.getName());
+
+                        try {
+                            // Creado el agentaction y los concepts necesarios, se introducen en el mensaje:
+                            getContentManager().fillContent(cfp, new Action(getAID(), of));
+                        } catch (CodecException | OntologyException ex){
+                            auctioneerGUI.addLog("Error enviando el mensaje cfp: " + ex.getMessage());
+                        }
+
+                        // Se establecen los destinatarios
+                        clients.forEach(client -> cfp.addReceiver(client));
+                        // Se procede al envío de los mensajes:
+                        myAgent.send(cfp);
+                        auctioneerGUI.addLog("Enviada solicitud de ronda de la subasta " + auction.getId() + " del libro " 
+                                + auction.getProductName() + " por " + auction.getPrice() + "€.");
+                    }
+                });
                 
                 // Actualizamos la interfaz:
                 auctioneerGUI.updateAuctions(activeAuctions);
             }
         });
+                
+        // La recepción de propuestas se hará según este patrón:
+        mt = MessageTemplate.and(MessageTemplate.MatchOntology(onto.getName()),
+                MessageTemplate.MatchLanguage(codec.getName()));
         
         // Añadimos un comportamiento cíclico para recepción de mensajes de los 
         // participantes de las subastas:

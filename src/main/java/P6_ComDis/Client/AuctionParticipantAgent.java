@@ -137,6 +137,13 @@ public class AuctionParticipantAgent extends Agent {
                             // Se procesa si tiene sentido:
                             for(DesiredBook db: desiredBooks) {
                                 if(db.getBookName().equals(of.getAuctionRound().getAuction().getBook())){
+                                    // Notificamos a la interfaz la llegada de esta subasta:
+                                    clientGUI.addTableRow(new AuctionClientData(of.getAuctionRound().getAuction().getAuctionID(),
+                                                of.getAuctionRound().getAuction().getBook(),
+                                                of.getAuctionRound().getRoundPrice(),
+                                                of.getAuctionRound().getAuction().getActualWinner(),
+                                                a.getActor().getName(),
+                                                AuctionState.EN_PROGRESO));
                                     // Si el precio ofrecido es menor que el precio que se está dispuesto a pagar... Se acepta.
                                     if(db.getMaxPrice() >= of.getAuctionRound().getRoundPrice()){
                                         // Se manda una respuesta aceptando el precio:
@@ -158,14 +165,7 @@ public class AuctionParticipantAgent extends Agent {
                                         break;
                                     }
                                 }
-                            }   
-                            // Notificamos a la interfaz la llegada de esta subasta:
-                            clientGUI.addTableRow(new AuctionClientData(of.getAuctionRound().getAuction().getAuctionID(),
-                                        of.getAuctionRound().getAuction().getBook(),
-                                        of.getAuctionRound().getRoundPrice(),
-                                        of.getAuctionRound().getAuction().getActualWinner(),
-                                        a.getActor().getName(),
-                                        AuctionState.EN_PROGRESO));
+                            }
                             break;
                         case ACLMessage.REJECT_PROPOSAL:
                             // Si rechazan nuestra solicitud, notificaremos a la interfaz para que muestre al ganador de la ronda:
@@ -200,20 +200,26 @@ public class AuctionParticipantAgent extends Agent {
                         case ACLMessage.INFORM:
                             // Se ha perdido esta subasta, por lo que se avisa y se mantiene el libro dentro de los deseados:
                             EndAuction ea = (EndAuction) a.getAction();
-                            // Marcaremos que la subasta ha sido cancelada si nadie ha participado
-                            AuctionState as = ea.getAuction().getActualWinner()==null 
-                                    || ea.getAuction().getActualWinner().isEmpty() 
-                                    ? AuctionState.CANCELADA : AuctionState.PERDIDA;
-                            // Actualizamos:
-                            clientGUI.addTableRow(new AuctionClientData(ea.getAuction().getAuctionID(),
-                                        ea.getAuction().getBook(),
-                                        ea.getAuction().getActualPrice(),
-                                        ea.getAuction().getActualWinner(),
-                                        a.getActor().getName(),
-                                        as));
-                            // Informamos del final:
-                            clientGUI.addLog("Perdida subasta del libro " + ea.getAuction().getBook() 
-                                    + " del subastador " + a.getActor().getName());
+                            // Comprobamos si es un libro en el que realmente ahora mismo estamos interesados:
+                            for(DesiredBook db: desiredBooks) {
+                                if(db.getBookName().equals(ea.getAuction().getBook())) {
+                                    // Marcaremos que la subasta ha sido cancelada si nadie ha participado
+                                    AuctionState as = ea.getAuction().getActualWinner()==null 
+                                            || ea.getAuction().getActualWinner().isEmpty() 
+                                            ? AuctionState.CANCELADA : AuctionState.PERDIDA;
+                                    // Actualizamos:
+                                    clientGUI.addTableRow(new AuctionClientData(ea.getAuction().getAuctionID(),
+                                                ea.getAuction().getBook(),
+                                                ea.getAuction().getActualPrice(),
+                                                ea.getAuction().getActualWinner(),
+                                                a.getActor().getName(),
+                                                as));
+                                    // Informamos del final:
+                                    clientGUI.addLog("Perdida subasta del libro " + ea.getAuction().getBook() 
+                                            + " del subastador " + a.getActor().getName());
+                                    break;
+                                }
+                            }
                             break;
                         case ACLMessage.REQUEST:
                             EndAuction endAuc = (EndAuction) a.getAction();

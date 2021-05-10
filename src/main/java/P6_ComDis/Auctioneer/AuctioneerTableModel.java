@@ -55,7 +55,7 @@ public class AuctioneerTableModel extends AbstractTableModel{
             case 0: nombre = "Id subasta"; break;
             case 1: nombre = "Libro"; break;
             case 2: nombre = "Precio actual"; break;
-            case 3: nombre = "Ganador previo"; break;
+            case 3: nombre = "Ganador actual"; break;
             case 4: nombre = "Estado"; break;
             case 5: nombre = "Nº interesados (ultima ronda)"; break;
         }
@@ -95,8 +95,7 @@ public class AuctioneerTableModel extends AbstractTableModel{
         switch (columnIndex) {
             case 0: result = auctions.get(rowIndex).getId(); break;
             case 1: result = auctions.get(rowIndex).getProductName(); break;
-            case 2: result = auctions.get(rowIndex).getPrice() < 0 || auctions.get(rowIndex).getRoundWinner().isEmpty() 
-                    ? "-" : auctions.get(rowIndex).getPrice(); break;
+            case 2: result = auctions.get(rowIndex).getPrice() < 0 ? "-" : auctions.get(rowIndex).getPrice(); break;
             case 3: result = auctions.get(rowIndex).getRoundWinner().isEmpty() ? "-" : auctions.get(rowIndex).getRoundWinner(); break;
             case 4: result = auctions.get(rowIndex).getIsFinished() ? "Terminada" : "En proceso"; break;
             case 5: result = auctions.get(rowIndex).getRoundParticipants() != null ? auctions.get(rowIndex).getRoundParticipants().size() : 0 ; break;
