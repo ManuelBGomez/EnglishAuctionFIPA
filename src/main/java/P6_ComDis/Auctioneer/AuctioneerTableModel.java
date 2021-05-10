@@ -96,7 +96,7 @@ public class AuctioneerTableModel extends AbstractTableModel{
             case 0: result = auctions.get(rowIndex).getId(); break;
             case 1: result = auctions.get(rowIndex).getProductName(); break;
             case 2: result = auctions.get(rowIndex).getPrice() < 0 ? "-" : auctions.get(rowIndex).getPrice(); break;
-            case 3: result = auctions.get(rowIndex).getRoundWinner().isEmpty() ? "-" : auctions.get(rowIndex).getRoundWinner(); break;
+            case 3: result = auctions.get(rowIndex).getRoundWinner().getName().isEmpty() ? "-" : auctions.get(rowIndex).getRoundWinner().getName(); break;
             case 4: result = auctions.get(rowIndex).getIsFinished() ? "Terminada" : "En proceso"; break;
             case 5: result = auctions.get(rowIndex).getRoundParticipants() != null ? auctions.get(rowIndex).getRoundParticipants().size() : 0 ; break;
         }

@@ -5,11 +5,11 @@ package P6_ComDis.ontologia;
 /**
 * Protege name: Offer
 * @author OntologyBeanGenerator v4.1
-* @version 2021/05/5, 21:39:32
+* @version 2021/05/10, 20:20:39
 */
 public class Offer implements jade.content.AgentAction {
 
-   private static final long serialVersionUID = -9098608021565808103L;
+   private static final long serialVersionUID = -3759134217654635196L;
 
   private String _internalInstanceName = null;
 
@@ -26,14 +26,14 @@ public class Offer implements jade.content.AgentAction {
   }
 
    /**
-   * Protege name: auctionRound
+   * Protege name: bookOffer
    */
-   private AuctionRound auctionRound;
-   public void setAuctionRound(AuctionRound value) { 
-    this.auctionRound=value;
+   private BookOffer bookOffer;
+   public void setBookOffer(BookOffer value) { 
+    this.bookOffer=value;
    }
-   public AuctionRound getAuctionRound() {
-     return this.auctionRound;
+   public BookOffer getBookOffer() {
+     return this.bookOffer;
    }
 
 }

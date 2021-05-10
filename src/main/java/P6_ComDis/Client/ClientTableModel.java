@@ -141,8 +141,10 @@ public class ClientTableModel extends AbstractTableModel{
         if(i >= auctions.size()) {
             auctions.add(auction);
         } else {
-            // En otro caso, se hace reemplazo en la posición correspondiente:
-            auctions.set(i, auction);
+            // En otro caso, se hace reemplazo en la posición correspondiente de los parámetros deseables no nulos:
+            if(auction.getRoundWinner() != null) auctions.get(i).setRoundWinner(auction.getRoundWinner());
+            if(auction.getPrice() != null) auctions.get(i).setPrice(auction.getPrice());
+            if(auction.getState() != null) auctions.get(i).setState(auction.getState());
         }
         fireTableDataChanged();
     }

@@ -6,11 +6,11 @@ import jade.content.schema.*;
 
 /** file: AuctionOntology.java
  * @author OntologyBeanGenerator v4.1
- * @version 2021/05/5, 21:39:32
+ * @version 2021/05/10, 20:20:39
  */
 public class AuctionOntology extends jade.content.onto.Ontology  {
 
-  private static final long serialVersionUID = -9098608021565808103L;
+  private static final long serialVersionUID = -3759134217654635196L;
 
   //NAME
   public static final String ONTOLOGY_NAME = "Auction";
@@ -22,22 +22,22 @@ public class AuctionOntology extends jade.content.onto.Ontology  {
 
 
    // VOCABULARY
-    public static final String OFFER_AUCTIONROUND="auctionRound";
+    public static final String OFFER_BOOKOFFER="bookOffer";
     public static final String OFFER="Offer";
-    public static final String ENDAUCTION_AUCTION="auction";
+    public static final String ENDAUCTION_LASTOFFER="lastOffer";
+    public static final String ENDAUCTION_WINNER="winner";
     public static final String ENDAUCTION="EndAuction";
-    public static final String ENDROUND_AUCTIONROUND="auctionRound";
+    public static final String ENDROUND_LASTOFFER="lastOffer";
+    public static final String ENDROUND_WINNER="winner";
     public static final String ENDROUND="EndRound";
-    public static final String BID_AUCTIONROUND="auctionRound";
+    public static final String BID_BOOKOFFER="bookOffer";
     public static final String BID="Bid";
-    public static final String AUCTION_BOOK="book";
-    public static final String AUCTION_ACTUALPRICE="actualPrice";
-    public static final String AUCTION_AUCTIONID="auctionID";
-    public static final String AUCTION_ACTUALWINNER="actualWinner";
-    public static final String AUCTION="Auction";
-    public static final String AUCTIONROUND_ROUNDPRICE="roundPrice";
-    public static final String AUCTIONROUND_AUCTION="auction";
-    public static final String AUCTIONROUND="AuctionRound";
+    public static final String BOOK_BNAME="bName";
+    public static final String BOOK="Book";
+    public static final String BOOKOFFER_PRICE="price";
+    public static final String BOOKOFFER_AUCTIONID="auctionId";
+    public static final String BOOKOFFER_BOOKINFO="bookInfo";
+    public static final String BOOKOFFER="BookOffer";
 
   /**
    * Constructor
@@ -47,10 +47,10 @@ public class AuctionOntology extends jade.content.onto.Ontology  {
     try { 
 
     // adding Concept(s)
-    ConceptSchema auctionRoundSchema = new ConceptSchema(AUCTIONROUND);
-    add(auctionRoundSchema, P6_ComDis.ontologia.AuctionRound.class);
-    ConceptSchema auctionSchema = new ConceptSchema(AUCTION);
-    add(auctionSchema, P6_ComDis.ontologia.Auction.class);
+    ConceptSchema bookOfferSchema = new ConceptSchema(BOOKOFFER);
+    add(bookOfferSchema, P6_ComDis.ontologia.BookOffer.class);
+    ConceptSchema bookSchema = new ConceptSchema(BOOK);
+    add(bookSchema, P6_ComDis.ontologia.Book.class);
 
     // adding AgentAction(s)
     AgentActionSchema bidSchema = new AgentActionSchema(BID);
@@ -68,16 +68,16 @@ public class AuctionOntology extends jade.content.onto.Ontology  {
 
 
     // adding fields
-    auctionRoundSchema.add(AUCTIONROUND_AUCTION, auctionSchema, ObjectSchema.MANDATORY);
-    auctionRoundSchema.add(AUCTIONROUND_ROUNDPRICE, (TermSchema)getSchema(BasicOntology.FLOAT), ObjectSchema.MANDATORY);
-    auctionSchema.add(AUCTION_ACTUALWINNER, (TermSchema)getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
-    auctionSchema.add(AUCTION_AUCTIONID, (TermSchema)getSchema(BasicOntology.INTEGER), ObjectSchema.MANDATORY);
-    auctionSchema.add(AUCTION_ACTUALPRICE, (TermSchema)getSchema(BasicOntology.FLOAT), ObjectSchema.OPTIONAL);
-    auctionSchema.add(AUCTION_BOOK, (TermSchema)getSchema(BasicOntology.STRING), ObjectSchema.MANDATORY);
-    bidSchema.add(BID_AUCTIONROUND, auctionRoundSchema, ObjectSchema.MANDATORY);
-    endRoundSchema.add(ENDROUND_AUCTIONROUND, auctionRoundSchema, ObjectSchema.MANDATORY);
-    endAuctionSchema.add(ENDAUCTION_AUCTION, auctionSchema, ObjectSchema.MANDATORY);
-    offerSchema.add(OFFER_AUCTIONROUND, auctionRoundSchema, ObjectSchema.MANDATORY);
+    bookOfferSchema.add(BOOKOFFER_BOOKINFO, bookSchema, ObjectSchema.MANDATORY);
+    bookOfferSchema.add(BOOKOFFER_AUCTIONID, (TermSchema)getSchema(BasicOntology.INTEGER), ObjectSchema.MANDATORY);
+    bookOfferSchema.add(BOOKOFFER_PRICE, (TermSchema)getSchema(BasicOntology.FLOAT), ObjectSchema.MANDATORY);
+    bookSchema.add(BOOK_BNAME, (TermSchema)getSchema(BasicOntology.STRING), ObjectSchema.MANDATORY);
+    bidSchema.add(BID_BOOKOFFER, bookOfferSchema, ObjectSchema.OPTIONAL);
+    endRoundSchema.add(ENDROUND_WINNER, (ConceptSchema)getSchema(BasicOntology.AID), ObjectSchema.MANDATORY);
+    endRoundSchema.add(ENDROUND_LASTOFFER, bookOfferSchema, ObjectSchema.MANDATORY);
+    endAuctionSchema.add(ENDAUCTION_WINNER, (ConceptSchema)getSchema(BasicOntology.AID), ObjectSchema.MANDATORY);
+    endAuctionSchema.add(ENDAUCTION_LASTOFFER, bookOfferSchema, ObjectSchema.MANDATORY);
+    offerSchema.add(OFFER_BOOKOFFER, bookOfferSchema, ObjectSchema.OPTIONAL);
 
     // adding name mappings
 

@@ -46,17 +46,17 @@ public class AuctionData {
      * Método que permite obtener el ganador de una ronda.
      * @return El nombre del ganador.
      */
-    public String getRoundWinner() {
+    public AID getRoundWinner() {
         if(roundParticipants != null && prevRoundParticipants != null){
             if(roundParticipants.size() >= 1){
                 // Si hay solo un participante o más, se devuelve el primero (o único):
-                return roundParticipants.get(0).getName();
+                return roundParticipants.get(0);
             } else {
                 // Si es 0, se devuelve el primero de la ronda anterior, si lo hay (si no se devuelve un string vacío):
-                return prevRoundParticipants.size() > 0 ? prevRoundParticipants.get(0).getName() : "";
+                return prevRoundParticipants.size() > 0 ? prevRoundParticipants.get(0) : null;
             }
         } else {
-            return "";
+            return null;
         }
     }
     

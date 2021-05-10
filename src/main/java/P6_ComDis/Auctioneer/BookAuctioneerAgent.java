@@ -1,9 +1,9 @@
 package P6_ComDis.Auctioneer;
 
-import P6_ComDis.ontologia.Auction;
 import P6_ComDis.ontologia.AuctionOntology;
-import P6_ComDis.ontologia.AuctionRound;
 import P6_ComDis.ontologia.Bid;
+import P6_ComDis.ontologia.Book;
+import P6_ComDis.ontologia.BookOffer;
 import P6_ComDis.ontologia.EndAuction;
 import P6_ComDis.ontologia.EndRound;
 import P6_ComDis.ontologia.Offer;
@@ -78,18 +78,21 @@ public class BookAuctioneerAgent extends Agent {
                         // Se comprueba si ha podido terminar la subasta:
                         if(auction.isAuctionFinished()){
                             // Si ha terminado, enviaremos un mensaje de final de subasta a todos los usuarios:
-                            Auction ac = new Auction();
+                            // Incluiremos la última oferta:
+                            Book book = new Book();
+                            book.setBName(auction.getProductName());
+                            BookOffer lastOffer = new BookOffer();
                             // El precio final puede variar en función de si gana un participante de la ronda actual o de la previa:
-                            if(auction.getRoundParticipants().isEmpty()) ac.setActualPrice(auction.getLastRoundPrice());
-                            else ac.setActualPrice(auction.getPrice());
-                            ac.setActualWinner(auction.getRoundWinner());
-                            ac.setAuctionID(auction.getId());
-                            ac.setBook(auction.getProductName());
+                            if(auction.getRoundParticipants().isEmpty()) lastOffer.setPrice(auction.getLastRoundPrice());
+                            else lastOffer.setPrice(auction.getPrice());
+                            lastOffer.setAuctionId(auction.getId());
+                            lastOffer.setBookInfo(book);
                             // Dejaremos el precio final en el de la ronda previa:
-                            auction.setPrice(ac.getActualPrice());
+                            auction.setPrice(lastOffer.getPrice());
                             // Se usa un agentaction específico de la finalización:
                             EndAuction ea = new EndAuction();
-                            ea.setAuction(ac);
+                            ea.setWinner(auction.getRoundWinner());
+                            ea.setLastOffer(lastOffer);
 
                             // Dos mensajes inform y request al finalizar una subasta: uno para el ganador y otro para el resto:
                             ACLMessage inf = new ACLMessage(ACLMessage.INFORM);
@@ -109,7 +112,7 @@ public class BookAuctioneerAgent extends Agent {
 
                             // Iteramos por todos los participantes:
                             clients.forEach(client -> {
-                               if(client.getName().equals(ac.getActualWinner())){
+                               if(client.equals(ea.getWinner())){
                                    // Ganador:
                                    req.addReceiver(client);
                                } else {
@@ -125,27 +128,26 @@ public class BookAuctioneerAgent extends Agent {
                             // Se establece el fin de la subasta:
                             auction.setIsFinished(true);
 
-                            if(ac.getActualWinner() == null || ac.getActualWinner().isEmpty()){
+                            if(ea.getWinner() == null){
                                 auctioneerGUI.addLog("Fin de la subasta " + auction.getId() + ". Nadie ha participado.");
                             } else {
                                 auctioneerGUI.addLog("Fin de la subasta " + auction.getId() + ". El libro " + auction.getProductName()
-                                                + " ha sido ganado por " + auction.getRoundWinner() + ", pagando " + ac.getActualPrice() + "€.");
+                                                + " ha sido ganado por " + auction.getRoundWinner() + ", pagando " + ea.getLastOffer().getPrice() + "€.");
                             }
                         } else {
                             // Lo primero es devolver una respuesta a los interesados de la ronda anterior:
                             // Para cada subasta, miraremos si hubo ronda previa y actuaremos en consecuencia.
                             if(auction.getNumRound() != 0) {
                                 // En caso de tener una ronda actual mayor que 0, lo que se hará será notificar el resultado de la ronda:
-                                Auction ac = new Auction();
-                                ac.setActualPrice(auction.getPrice());
-                                ac.setActualWinner(auction.getRoundWinner());
-                                ac.setAuctionID(auction.getId());
-                                ac.setBook(auction.getProductName());
-                                AuctionRound ar = new AuctionRound();
-                                ar.setAuction(ac);
-                                ar.setRoundPrice(auction.getPrice());
+                                Book book = new Book();
+                                book.setBName(auction.getProductName());
+                                BookOffer lastOffer = new BookOffer();
+                                lastOffer.setPrice(auction.getPrice());
+                                lastOffer.setAuctionId(auction.getId());
+                                lastOffer.setBookInfo(book);
                                 EndRound er = new EndRound();
-                                er.setAuctionRound(ar);
+                                er.setWinner(auction.getRoundWinner());
+                                er.setLastOffer(lastOffer);
 
                                 // Mensajes accept-proposal y reject-proposal para ganadores/perdedores de una ronda:
                                 ACLMessage ap = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
@@ -165,7 +167,7 @@ public class BookAuctioneerAgent extends Agent {
 
                                 // Enviaremos el accept proposal al agente ganador de esta ronda, evidentemente:
                                 auction.getRoundParticipants().forEach(client -> {
-                                    if(client.getName().equals(ac.getActualWinner())){
+                                    if(client.equals(er.getWinner())){
                                         // Ganador:
                                         ap.addReceiver(client);
                                     } else {
@@ -221,16 +223,14 @@ public class BookAuctioneerAgent extends Agent {
                     if(!auction.getIsFinished()){
                         // Hecho lo anterior, se recuperan los datos y se envían las peticiones pertinentes:
                         // A cada usuario, una por subasta:
-                        Auction ac = new Auction();
-                        ac.setActualPrice(auction.getLastRoundPrice());
-                        ac.setActualWinner(auction.getRoundWinner());
-                        ac.setAuctionID(auction.getId());
-                        ac.setBook(auction.getProductName());
-                        AuctionRound ar = new AuctionRound();
-                        ar.setAuction(ac);
-                        ar.setRoundPrice(auction.getPrice());
+                        Book book = new Book();
+                        book.setBName(auction.getProductName());
+                        BookOffer bof = new BookOffer();
+                        bof.setAuctionId(auction.getId());
+                        bof.setBookInfo(book);
+                        bof.setPrice(auction.getPrice());
                         Offer of = new Offer();
-                        of.setAuctionRound(ar);
+                        of.setBookOffer(bof);
 
                         // Será un mensaje cfp para enviar solicitud de ronda de subasta:
                         ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
@@ -323,16 +323,16 @@ public class BookAuctioneerAgent extends Agent {
                     // de puja en una subasta (AgentAction bid):
                     Action cont = (Action) getContentManager().extractContent(msg);
                     Bid bid = (Bid) cont.getAction();
-                    AuctionRound ar = bid.getAuctionRound();
+                    BookOffer bOf = bid.getBookOffer();
                     // Recuperamos también al actor que acepta:
                     AID agent = cont.getActor();
                     // Vamos a comprobar si la puja con el id indicado sigue activa 
-                    if(activeAuctions.containsKey(ar.getAuction().getAuctionID())) {
+                    if(activeAuctions.containsKey(bOf.getAuctionId())) {
                         // Si está activa, comprobamos que el precio por el que se puja no se ha incrementado
                         // (o sea, seguimos en la ronda actual):
-                        if(activeAuctions.get(ar.getAuction().getAuctionID()).getPrice().equals(ar.getRoundPrice())) {
+                        if(activeAuctions.get(bOf.getAuctionId()).getPrice().equals(bOf.getPrice())) {
                             // Si los precios coinciden, añadimos al agente a la lista de participantes de la ronda:
-                            activeAuctions.get(ar.getAuction().getAuctionID()).getRoundParticipants().add(agent);
+                            activeAuctions.get(bOf.getAuctionId()).getRoundParticipants().add(agent);
                         }
                     }
                     

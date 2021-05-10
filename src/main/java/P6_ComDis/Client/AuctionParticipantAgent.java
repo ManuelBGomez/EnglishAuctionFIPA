@@ -136,30 +136,30 @@ public class AuctionParticipantAgent extends Agent {
                             Offer of = (Offer) a.getAction();
                             // Se procesa si tiene sentido:
                             for(DesiredBook db: desiredBooks) {
-                                if(db.getBookName().equals(of.getAuctionRound().getAuction().getBook())){
+                                if(db.getBookName().equals(of.getBookOffer().getBookInfo().getBName())){
                                     // Notificamos a la interfaz la llegada de esta subasta:
-                                    clientGUI.addTableRow(new AuctionClientData(of.getAuctionRound().getAuction().getAuctionID(),
-                                                of.getAuctionRound().getAuction().getBook(),
-                                                of.getAuctionRound().getRoundPrice(),
-                                                of.getAuctionRound().getAuction().getActualWinner(),
+                                    clientGUI.addTableRow(new AuctionClientData(of.getBookOffer().getAuctionId(),
+                                                of.getBookOffer().getBookInfo().getBName(),
+                                                of.getBookOffer().getPrice(),
+                                                null,
                                                 a.getActor().getName(),
                                                 AuctionState.EN_PROGRESO));
                                     // Si el precio ofrecido es menor que el precio que se está dispuesto a pagar... Se acepta.
-                                    if(db.getMaxPrice() >= of.getAuctionRound().getRoundPrice()){
+                                    if(db.getMaxPrice() >= of.getBookOffer().getPrice()){
                                         // Se manda una respuesta aceptando el precio:
                                         ACLMessage resp = msg.createReply();
                                         // Se usa el AgentAction bid (puja):
                                         Bid bid = new Bid();
                                         // Se asocia el concept auctionround, indicando el precio que se acepta.
-                                        bid.setAuctionRound(of.getAuctionRound());
+                                        bid.setBookOffer(of.getBookOffer());
                                         // Se rellena el mensaje:
                                         getContentManager().fillContent(resp, new Action(myAgent.getAID(), bid));
                                         // La performativa es un propose:
                                         resp.setPerformative(ACLMessage.PROPOSE);
                                         // Enviamos la respuesta pertinente:
                                         myAgent.send(resp);
-                                        clientGUI.addLog("Pujando " + of.getAuctionRound().getRoundPrice() 
-                                                + "€ en la subasta del libro " + of.getAuctionRound().getAuction().getBook() 
+                                        clientGUI.addLog("Pujando " + of.getBookOffer().getPrice() 
+                                                + "€ en la subasta del libro " + of.getBookOffer().getBookInfo().getBName()
                                                 + " del agente " + a.getActor().getName());
                                         // Se sale del bucle:
                                         break;
@@ -170,30 +170,30 @@ public class AuctionParticipantAgent extends Agent {
                         case ACLMessage.REJECT_PROPOSAL:
                             // Si rechazan nuestra solicitud, notificaremos a la interfaz para que muestre al ganador de la ronda:
                             EndRound er = (EndRound) a.getAction();
-                            clientGUI.addLog("Perdida puja por " + er.getAuctionRound().getRoundPrice() 
-                                    + "€ en la subasta del libro " + er.getAuctionRound().getAuction().getBook() 
+                            clientGUI.addLog("Perdida puja por " + er.getLastOffer().getPrice() 
+                                    + "€ en la subasta del libro " + er.getLastOffer().getBookInfo().getBName() 
                                     + " del agente " + a.getActor().getName());
                             
                             // Notificamos a la interfaz la llegada de esta subasta:
-                            clientGUI.addTableRow(new AuctionClientData(er.getAuctionRound().getAuction().getAuctionID(),
-                                        er.getAuctionRound().getAuction().getBook(),
-                                        er.getAuctionRound().getRoundPrice(),
-                                        er.getAuctionRound().getAuction().getActualWinner(),
+                            clientGUI.addTableRow(new AuctionClientData(er.getLastOffer().getAuctionId(),
+                                        er.getLastOffer().getBookInfo().getBName(),
+                                        er.getLastOffer().getPrice(),
+                                        er.getWinner().getName(),
                                         a.getActor().getName(),
                                         AuctionState.EN_PROGRESO));
                             break;
                         case ACLMessage.ACCEPT_PROPOSAL:
                             // Si rechazan nuestra solicitud, notificaremos a la interfaz para que muestre al ganador de la ronda:
                             EndRound endR = (EndRound) a.getAction();
-                            clientGUI.addLog("Ganada puja por " + endR.getAuctionRound().getRoundPrice() 
-                                    + "€ en la subasta del libro " + endR.getAuctionRound().getAuction().getBook() 
+                            clientGUI.addLog("Ganada puja por " + endR.getLastOffer().getPrice() 
+                                    + "€ en la subasta del libro " + endR.getLastOffer().getBookInfo().getBName() 
                                     + " del agente " + a.getActor().getName());
                             
                             // Notificamos a la interfaz la llegada de esta subasta:
-                            clientGUI.addTableRow(new AuctionClientData(endR.getAuctionRound().getAuction().getAuctionID(),
-                                        endR.getAuctionRound().getAuction().getBook(),
-                                        endR.getAuctionRound().getRoundPrice(),
-                                        endR.getAuctionRound().getAuction().getActualWinner(),
+                            clientGUI.addTableRow(new AuctionClientData(endR.getLastOffer().getAuctionId(),
+                                        endR.getLastOffer().getBookInfo().getBName(),
+                                        endR.getLastOffer().getPrice(),
+                                        endR.getWinner().getName(),
                                         a.getActor().getName(),
                                         AuctionState.EN_PROGRESO));
                             break;
@@ -202,20 +202,19 @@ public class AuctionParticipantAgent extends Agent {
                             EndAuction ea = (EndAuction) a.getAction();
                             // Comprobamos si es un libro en el que realmente ahora mismo estamos interesados:
                             for(DesiredBook db: desiredBooks) {
-                                if(db.getBookName().equals(ea.getAuction().getBook())) {
+                                if(db.getBookName().equals(ea.getLastOffer().getBookInfo().getBName())) {
                                     // Marcaremos que la subasta ha sido cancelada si nadie ha participado
-                                    AuctionState as = ea.getAuction().getActualWinner()==null 
-                                            || ea.getAuction().getActualWinner().isEmpty() 
+                                    AuctionState as = ea.getWinner()==null
                                             ? AuctionState.CANCELADA : AuctionState.PERDIDA;
                                     // Actualizamos:
-                                    clientGUI.addTableRow(new AuctionClientData(ea.getAuction().getAuctionID(),
-                                                ea.getAuction().getBook(),
-                                                ea.getAuction().getActualPrice(),
-                                                ea.getAuction().getActualWinner(),
+                                    clientGUI.addTableRow(new AuctionClientData(ea.getLastOffer().getAuctionId(),
+                                                ea.getLastOffer().getBookInfo().getBName(),
+                                                ea.getLastOffer().getPrice(),
+                                                ea.getWinner().getName(),
                                                 a.getActor().getName(),
                                                 as));
                                     // Informamos del final:
-                                    clientGUI.addLog("Perdida subasta del libro " + ea.getAuction().getBook() 
+                                    clientGUI.addLog("Perdida subasta del libro " + ea.getLastOffer().getBookInfo().getBName() 
                                             + " del subastador " + a.getActor().getName());
                                     break;
                                 }
@@ -224,16 +223,16 @@ public class AuctionParticipantAgent extends Agent {
                         case ACLMessage.REQUEST:
                             EndAuction endAuc = (EndAuction) a.getAction();
                             // Se ha ganado esta subasta, por lo que se avisa a la interfaz y se elimina el libro de los deseados:
-                            desiredBooks.removeIf(book -> book.getBookName().equals(endAuc.getAuction().getBook()));
-                            clientGUI.addTableRow(new AuctionClientData(endAuc.getAuction().getAuctionID(),
-                                        endAuc.getAuction().getBook(),
-                                        endAuc.getAuction().getActualPrice(),
-                                        endAuc.getAuction().getActualWinner(),
+                            desiredBooks.removeIf(book -> book.getBookName().equals(endAuc.getLastOffer().getBookInfo().getBName()));
+                            clientGUI.addTableRow(new AuctionClientData(endAuc.getLastOffer().getAuctionId(),
+                                        endAuc.getLastOffer().getBookInfo().getBName(),
+                                        endAuc.getLastOffer().getPrice(),
+                                        endAuc.getWinner().getName(),
                                         a.getActor().getName(),
                                         AuctionState.GANADA));
                             // Informamos del final
-                            clientGUI.addLog("Ganada subasta del libro " + endAuc.getAuction().getBook() 
-                                    + " del subastador " + a.getActor().getName() + " por " + endAuc.getAuction().getActualPrice() + "€.");
+                            clientGUI.addLog("Ganada subasta del libro " + endAuc.getLastOffer().getBookInfo().getBName() 
+                                    + " del subastador " + a.getActor().getName() + " por " + endAuc.getLastOffer().getPrice() + "€.");
                             break;
                         default:
                             break;
