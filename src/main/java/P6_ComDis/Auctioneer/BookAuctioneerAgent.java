@@ -91,7 +91,8 @@ public class BookAuctioneerAgent extends Agent {
                             auction.setPrice(lastOffer.getPrice());
                             // Se usa un agentaction específico de la finalización:
                             EndAuction ea = new EndAuction();
-                            ea.setWinner(auction.getRoundWinner());
+                            // El ganador de la subasta puede ser un valor nulo si no ha habido pujas:
+                            ea.setAuctionWinner(auction.getRoundWinner());
                             ea.setLastOffer(lastOffer);
 
                             // Dos mensajes inform y request al finalizar una subasta: uno para el ganador y otro para el resto:
@@ -112,7 +113,7 @@ public class BookAuctioneerAgent extends Agent {
 
                             // Iteramos por todos los participantes:
                             clients.forEach(client -> {
-                               if(client.equals(ea.getWinner())){
+                               if(ea.getAuctionWinner() != null && client.equals(ea.getAuctionWinner())){
                                    // Ganador:
                                    req.addReceiver(client);
                                } else {
@@ -128,7 +129,7 @@ public class BookAuctioneerAgent extends Agent {
                             // Se establece el fin de la subasta:
                             auction.setIsFinished(true);
 
-                            if(ea.getWinner() == null){
+                            if(ea.getAuctionWinner() == null){
                                 auctioneerGUI.addLog("Fin de la subasta " + auction.getId() + ". Nadie ha participado.");
                             } else {
                                 auctioneerGUI.addLog("Fin de la subasta " + auction.getId() + ". El libro " + auction.getProductName()

@@ -6,11 +6,11 @@ import jade.content.schema.*;
 
 /** file: AuctionOntology.java
  * @author OntologyBeanGenerator v4.1
- * @version 2021/05/10, 20:20:39
+ * @version 2021/05/11, 21:25:05
  */
 public class AuctionOntology extends jade.content.onto.Ontology  {
 
-  private static final long serialVersionUID = -3759134217654635196L;
+  private static final long serialVersionUID = -772136991049806111L;
 
   //NAME
   public static final String ONTOLOGY_NAME = "Auction";
@@ -24,8 +24,8 @@ public class AuctionOntology extends jade.content.onto.Ontology  {
    // VOCABULARY
     public static final String OFFER_BOOKOFFER="bookOffer";
     public static final String OFFER="Offer";
+    public static final String ENDAUCTION_AUCTIONWINNER="auctionWinner";
     public static final String ENDAUCTION_LASTOFFER="lastOffer";
-    public static final String ENDAUCTION_WINNER="winner";
     public static final String ENDAUCTION="EndAuction";
     public static final String ENDROUND_LASTOFFER="lastOffer";
     public static final String ENDROUND_WINNER="winner";
@@ -72,12 +72,12 @@ public class AuctionOntology extends jade.content.onto.Ontology  {
     bookOfferSchema.add(BOOKOFFER_AUCTIONID, (TermSchema)getSchema(BasicOntology.INTEGER), ObjectSchema.MANDATORY);
     bookOfferSchema.add(BOOKOFFER_PRICE, (TermSchema)getSchema(BasicOntology.FLOAT), ObjectSchema.MANDATORY);
     bookSchema.add(BOOK_BNAME, (TermSchema)getSchema(BasicOntology.STRING), ObjectSchema.MANDATORY);
-    bidSchema.add(BID_BOOKOFFER, bookOfferSchema, ObjectSchema.OPTIONAL);
+    bidSchema.add(BID_BOOKOFFER, bookOfferSchema, ObjectSchema.MANDATORY);
     endRoundSchema.add(ENDROUND_WINNER, (ConceptSchema)getSchema(BasicOntology.AID), ObjectSchema.MANDATORY);
     endRoundSchema.add(ENDROUND_LASTOFFER, bookOfferSchema, ObjectSchema.MANDATORY);
-    endAuctionSchema.add(ENDAUCTION_WINNER, (ConceptSchema)getSchema(BasicOntology.AID), ObjectSchema.MANDATORY);
     endAuctionSchema.add(ENDAUCTION_LASTOFFER, bookOfferSchema, ObjectSchema.MANDATORY);
-    offerSchema.add(OFFER_BOOKOFFER, bookOfferSchema, ObjectSchema.OPTIONAL);
+    endAuctionSchema.add(ENDAUCTION_AUCTIONWINNER, (ConceptSchema)getSchema(BasicOntology.AID), ObjectSchema.OPTIONAL);
+    offerSchema.add(OFFER_BOOKOFFER, bookOfferSchema, ObjectSchema.MANDATORY);
 
     // adding name mappings
 

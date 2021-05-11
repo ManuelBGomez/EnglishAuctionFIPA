@@ -204,13 +204,13 @@ public class AuctionParticipantAgent extends Agent {
                             for(DesiredBook db: desiredBooks) {
                                 if(db.getBookName().equals(ea.getLastOffer().getBookInfo().getBName())) {
                                     // Marcaremos que la subasta ha sido cancelada si nadie ha participado
-                                    AuctionState as = ea.getWinner()==null
+                                    AuctionState as = ea.getAuctionWinner()==null
                                             ? AuctionState.CANCELADA : AuctionState.PERDIDA;
                                     // Actualizamos:
                                     clientGUI.addTableRow(new AuctionClientData(ea.getLastOffer().getAuctionId(),
                                                 ea.getLastOffer().getBookInfo().getBName(),
                                                 ea.getLastOffer().getPrice(),
-                                                ea.getWinner().getName(),
+                                                ea.getAuctionWinner().getName(),
                                                 a.getActor().getName(),
                                                 as));
                                     // Informamos del final:
@@ -227,7 +227,7 @@ public class AuctionParticipantAgent extends Agent {
                             clientGUI.addTableRow(new AuctionClientData(endAuc.getLastOffer().getAuctionId(),
                                         endAuc.getLastOffer().getBookInfo().getBName(),
                                         endAuc.getLastOffer().getPrice(),
-                                        endAuc.getWinner().getName(),
+                                        endAuc.getAuctionWinner().getName(),
                                         a.getActor().getName(),
                                         AuctionState.GANADA));
                             // Informamos del final

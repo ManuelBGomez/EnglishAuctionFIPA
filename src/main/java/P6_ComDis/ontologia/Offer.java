@@ -5,11 +5,11 @@ package P6_ComDis.ontologia;
 /**
 * Protege name: Offer
 * @author OntologyBeanGenerator v4.1
-* @version 2021/05/10, 20:20:39
+* @version 2021/05/11, 21:25:06
 */
 public class Offer implements jade.content.AgentAction {
 
-   private static final long serialVersionUID = -3759134217654635196L;
+   private static final long serialVersionUID = -772136991049806111L;
 
   private String _internalInstanceName = null;
 
