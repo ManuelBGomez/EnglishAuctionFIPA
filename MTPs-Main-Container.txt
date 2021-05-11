@@ -1,1 +1,1 @@
-http://LAPTOP-JDJ83MPN.mshome.net:7778/acc
+http://LAPTOP-JDJ83MPN:7778/acc
