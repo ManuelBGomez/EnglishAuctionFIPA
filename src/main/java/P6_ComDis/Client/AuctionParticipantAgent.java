@@ -25,6 +25,8 @@ import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Clase que representa al participante de una subasta
@@ -111,6 +113,22 @@ public class AuctionParticipantAgent extends Agent {
                         + " con un tope de " + newBook.getMaxPrice() + "€.");
             }
         });
+    }
+    
+    /**
+     * Método de finalización del agente.
+     */
+    @Override
+    public void takeDown() {
+        try {
+            // Nos salimos del DF:
+            DFService.deregister(this);
+        } catch (FIPAException ex) {
+            // Excepción lanzada en caso de producirse algún problema:
+            System.out.println("Error en el derregistro del comprador: " + ex.getMessage());
+        }
+        // Imprimimos mensaje de cierre
+        System.out.println("Agente "+getAID().getName()+" acabando.");
     }
     
     /**

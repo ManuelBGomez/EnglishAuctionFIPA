@@ -133,7 +133,7 @@ public class BookAuctioneerAgent extends Agent {
                                 auctioneerGUI.addLog("Fin de la subasta " + auction.getId() + ". Nadie ha participado.");
                             } else {
                                 auctioneerGUI.addLog("Fin de la subasta " + auction.getId() + ". El libro " + auction.getProductName()
-                                                + " ha sido ganado por " + auction.getRoundWinner() + ", pagando " + ea.getLastOffer().getPrice() + "€.");
+                                                + " ha sido ganado por " + auction.getRoundWinner().getName() + ", pagando " + ea.getLastOffer().getPrice() + "€.");
                             }
                         } else {
                             // Lo primero es devolver una respuesta a los interesados de la ronda anterior:
@@ -180,7 +180,7 @@ public class BookAuctioneerAgent extends Agent {
                                 // Enviamos mensajes y avanzamos de ronda:
                                 myAgent.send(ap);
                                 myAgent.send(rp);
-                                auctioneerGUI.addLog("El actor " + auction.getRoundWinner() + " gana la ronda en la subasta del libro " 
+                                auctioneerGUI.addLog("El actor " + auction.getRoundWinner().getName() + " gana la ronda en la subasta del libro " 
                                         + auction.getProductName() + " por " + auction.getPrice() + "€.");
 
                             }

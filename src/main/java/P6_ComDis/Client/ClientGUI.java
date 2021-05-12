@@ -59,10 +59,15 @@ public class ClientGUI extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         logText = new javax.swing.JTextArea();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1280, 720));
         setResizable(false);
         setSize(new java.awt.Dimension(1280, 720));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         jPanel1.setMinimumSize(new java.awt.Dimension(780, 720));
         jPanel1.setPreferredSize(new java.awt.Dimension(780, 720));
@@ -248,6 +253,11 @@ public class ClientGUI extends javax.swing.JFrame {
     private void bookNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookNameActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_bookNameActionPerformed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        // Cerramos agente:
+        client.doDelete();
+    }//GEN-LAST:event_formWindowClosed
 
     public void showGui(String title) {
         pack();
