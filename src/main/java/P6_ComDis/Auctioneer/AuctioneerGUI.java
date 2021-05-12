@@ -269,7 +269,7 @@ public class AuctioneerGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_bookPriceActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        // Cerramos agente:
+        //Cerramos agente:
         auctioneer.doDelete();
     }//GEN-LAST:event_formWindowClosed
 

@@ -228,7 +228,7 @@ public class AuctionParticipantAgent extends Agent {
                                     clientGUI.addTableRow(new AuctionClientData(ea.getLastOffer().getAuctionId(),
                                                 ea.getLastOffer().getBookInfo().getBName(),
                                                 ea.getLastOffer().getPrice(),
-                                                ea.getAuctionWinner().getName(),
+                                                ea.getAuctionWinner() != null ? ea.getAuctionWinner().getName() : "-",
                                                 a.getActor().getName(),
                                                 as));
                                     // Informamos del final:

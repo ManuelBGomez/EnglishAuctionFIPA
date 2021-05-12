@@ -96,7 +96,7 @@ public class ClientTableModel extends AbstractTableModel{
             case 0: result = auctions.get(rowIndex).getId(); break;
             case 1: result = auctions.get(rowIndex).getProductName(); break;
             case 2: result = auctions.get(rowIndex).getPrice() < 0 ? "-" : auctions.get(rowIndex).getPrice() ; break;
-            case 3: result = auctions.get(rowIndex).getRoundWinner().isEmpty() ? "-" : auctions.get(rowIndex).getRoundWinner(); break;
+            case 3: result = auctions.get(rowIndex).getRoundWinner() == null ? "-" : auctions.get(rowIndex).getRoundWinner(); break;
             case 4: result = auctions.get(rowIndex).getAuctioneer(); break;
             case 5: result = auctions.get(rowIndex).getState(); break;
         }
