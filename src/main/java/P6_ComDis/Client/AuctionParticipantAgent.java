@@ -25,8 +25,6 @@ import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Clase que representa al participante de una subasta
@@ -168,7 +166,7 @@ public class AuctionParticipantAgent extends Agent {
                                         ACLMessage resp = msg.createReply();
                                         // Se usa el AgentAction bid (puja):
                                         Bid bid = new Bid();
-                                        // Se asocia el concept auctionround, indicando el precio que se acepta.
+                                        // Se asocia el concept bookoffer, indicando el precio que se acepta.
                                         bid.setBookOffer(of.getBookOffer());
                                         // Se rellena el mensaje:
                                         getContentManager().fillContent(resp, new Action(myAgent.getAID(), bid));
