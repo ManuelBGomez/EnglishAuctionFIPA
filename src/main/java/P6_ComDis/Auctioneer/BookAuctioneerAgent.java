@@ -238,6 +238,7 @@ public class BookAuctioneerAgent extends Agent {
                         // La ontología y el lenguaje no variarán:
                         cfp.setOntology(onto.getName());
                         cfp.setLanguage(codec.getName());
+                        cfp.setReplyWith("cfp"+System.currentTimeMillis());
 
                         try {
                             // Creado el agentaction y los concepts necesarios, se introducen en el mensaje:
